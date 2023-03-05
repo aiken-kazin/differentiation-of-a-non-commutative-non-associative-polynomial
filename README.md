@@ -1,0 +1,1 @@
+# differentiation-of-a-non-commutative-non-associative-polynomial
