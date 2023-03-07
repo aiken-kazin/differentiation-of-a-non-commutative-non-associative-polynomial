@@ -1,0 +1,103 @@
+(* 
+This part of the code takes a monomial-list and returrns the list of \
+terms in glex order.For example: input \
+fs="(ab)a"+"(ba)a"-"a(ab)"-2"b(aa)", 
+output: 
+output: {-"a(ab)","(ab)a","(ba)a",-2 "b(aa)"}
+*)
+transList[f_] := (
+  rr = {};
+  For[i = 0, i < Length[f], i++;
+   AppendTo[rr, f[[i]]];
+   ];
+  Return[rr];
+  )
+fs = "(ab)a" + "(ba)a" - "a(ab)" - 2 "b(aa)";
+transList[fs]
+
+(*This part of the code takes the monomial as a list and return the \
+list of coeffients of a monoms of a monomial.
+For example, input: flist={-"a(ab)","(ab)a","(ba)a",-2"b(aa)"}
+output: {-1,1,1,-2}
+*)
+list = {-"a(ab)", "(ab)a", "(ba)a", -2 "b(aa)"};
+getCoef[flist_] := (
+  qq = {};
+  f2list = 2*flist;
+  For[i = 0, i < Length[f2list], i++;
+   AppendTo[qq, f2list[[i]][[1]]];
+   ];
+  Return[qq/2]
+  )
+getCoef[list]
+
+
+(*
+This code takes a single monom and returns the linearization of this \
+monom
+*)
+linearize[f_, a_, b_] := (
+  l1st = StringSplit[f, ""];
+  output = {};
+  count = 1;
+  
+  For[i = 0, i < Length[l1st], i++;
+   If[l1st[[i]] == a, AppendTo[output, {}];
+    l1st[[i]] = b;
+    For[j = 0, j < Length[l1st], j++;
+     AppendTo[output[[count]], l1st[[j]]];
+     ];
+    l1st[[i]] = a;
+    count++;
+    ]
+   ];
+  out = {};
+  For[i = 0, i < Length[output], i++;
+   AppendTo[out, StringJoin[output[[i]]]];
+   ];
+  Return[Total[out]]
+  )
+f = "a(a(ab))";
+linearize[f, "a", "(bb)"]
+
+
+(* This part of the code takes a monomial like \
+f="(ab)a"+"(ba)a"-"a(ab)"-2"b(aa)" and returns the list of single \
+monoms inalphabet order:
+output: {"a(ab)","(ab)a","(ba)a","b(aa)"}
+*)
+getMonom[f_] := (
+  w = {};
+  sm = transList[f];
+  coef = getCoef[sm];
+  For[i = 0, i < Length[sm], i++;
+   sm[[i]] = sm[[i]]/coef[[i]];
+   ];
+  Return[sm]
+  )
+f = "(ab)a" + "(ba)a" - "a(ab)" - 2 "b(aa)";
+getMonom[f]
+
+
+(*This part of the code takes a monomial and returns whol \
+linearization of the monom by a fixed character
+*)
+getLinearization[f_, a_, b_] := (
+  w = {};
+  listmonom = transList[f];
+  coef = getCoef[listmonom];
+  monoms = getMonom[f];
+  
+  For[i = 0, i < Length[coef], i++;
+   linMon = linearize[monoms, a, b];
+   AppendTo[w, linMon];
+   ];
+  For[i = 0, i < Length[coef], i++;
+   w[[i]] = w[[i]]*coef[[i]];
+   ];
+  Return[Total[w]]
+  )
+  (* 
+  f = "(aa)b" + "(ba)a";
+getLinearization[f, "a", "b"]
+*)
